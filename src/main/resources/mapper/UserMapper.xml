@@ -4,7 +4,6 @@
 
     <!-- 全ユーザーを取得するクエリ -->
     <select id="selectAll" resultType="com.example.domain.entity.User">
-        resultType="com.example.domain.entity.User">
         SELECT id, name, age, address FROM user
     </select>
 
