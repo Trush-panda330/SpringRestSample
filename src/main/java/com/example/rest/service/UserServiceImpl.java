@@ -1,23 +1,20 @@
 package com.example.rest.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.domain.entity.User;
-import com.example.domain.mapper.UserMapper;
+import com.example.domain.mapper.UserRepository;
+import com.example.rest.dto.UserDTO;
 import com.example.rest.exception.UserCreationException;
 import com.example.rest.exception.UserDeletionException;
 import com.example.rest.exception.UserNotFoundException;
 import com.example.rest.exception.UserUpdateException;
-import com.example.rest.response.UserResponse;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * ユーザーサービスの実装クラスです。ユーザー情報の取得、作成、更新、削除などの
@@ -25,11 +22,11 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserServiceIF {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+//	private static final Logger logger = LoggerFactory.getLogger(UserServiceIF.class);
 
-	private final UserMapper mapper;
+	private final UserRepository repository;
 
 	/**
 	 * 全てのユーザー情報を取得します。
@@ -37,10 +34,10 @@ public class UserServiceImpl implements UserService {
 	 * @return すべてのユーザーの情報を含むリスト
 	 */
 	@Override
-	public List<UserResponse> getAllUser() {
-		return mapper.findAllUser()
+	public List<UserDTO> getAllUser() {
+		return repository.selectAll()
 				.stream()
-				.map(user -> new UserResponse(
+				.map(user -> new UserDTO(
 						user.getId(),
 						user.getName(),
 						user.getAge(),
@@ -56,12 +53,12 @@ public class UserServiceImpl implements UserService {
 	 * @throws UserNotFoundException 指定されたIDのユーザーが見つからない場合にスローされます。
 	 */
 	@Override
-	public UserResponse getUserById(Long id) {
-		User user = mapper.findById(id);
-		if (user == null) {
+	public UserDTO getUserById(Long id) {
+		Optional<User> user = repository.selectById(id);
+		if (user.isEmpty()) {
 			throw new UserNotFoundException("指定されたIDのユーザーは存在しません。ID:" + id);
 		}
-		return new UserResponse(user.getId(), user.getName(), user.getAge(), user.getAddress());
+		return new UserDTO(user.get().getId(), user.get().getName(), user.get().getAge(), user.get().getAddress());
 	}
 
 	/**
@@ -73,13 +70,13 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Transactional
 	@Override
-	public UserResponse createUser(@Valid User user) {
-		int rowsAffected = mapper.createUser(user); // ここでIDがセットされる
+	public UserDTO createUser(@Valid User user) {
+		int rowsAffected = repository.insert(user); // ここでIDがセットされる
 
 		if (rowsAffected == 0) {
 			throw new UserCreationException("ユーザーの作成に失敗しました。");
 		}
-		return new UserResponse(user.getId(), user.getName(), user.getAge(), user.getAddress());
+		return new UserDTO(user.getId(), user.getName(), user.getAge(), user.getAddress());
 	}
 
 	/**
@@ -91,16 +88,16 @@ public class UserServiceImpl implements UserService {
 	 * @throws UserUpdateException 指定されたIDのユーザーが見つからない場合にスローされます。
 	 */
 	@Override
-	public UserResponse updateUser(Long id, User user) {
-		User existingUser = mapper.findById(id);
-		if (existingUser == null) {
+	public UserDTO updateUser(Long id, User user) {
+		Optional<User> existingUser = repository.selectById(id);
+		if (existingUser.isEmpty()) {
 			throw new UserUpdateException("指定したユーザーは見つかりませんでした。ID: " + id);
 		}
 
 		user.setId(id);
-		mapper.updateUser(id, user); // 更新処理
+		repository.update(id, user); // 更新処理
 
-		return new UserResponse(user.getId(), user.getName(), user.getAge(), user.getAddress());
+		return new UserDTO(user.getId(), user.getName(), user.getAge(), user.getAddress());
 	}
 
 	/**
@@ -113,28 +110,11 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Transactional
 	@Override
-	public UserResponse deleteUser(Long id) {
+	public UserDTO deleteUser(Long id) {
 		// ユーザーをIDで検索
-		User user = mapper.findById(id);
-
-		// ユーザーが存在しない場合の処理
-		if (user == null) {
-			logger.warn("ユーザーが見つかりませんでした。指定されたID: {}", id);
-			throw new UserNotFoundException("指定されたIDのユーザーは存在しません。ID:" + id);
-		}
-
-		try {
-			// ユーザーを削除
-			mapper.deleteUser(id);
-			logger.info("ユーザーが削除されました。ユーザーID: {}", id);
-		} catch (Exception ex) {
-			// エラー発生時のロギング
-			logger.error("ユーザーの削除に失敗しました。ユーザーID：{}", id, ex);
-			throw new UserDeletionException("ユーザーの削除に失敗しました。ユーザーID：" + id, ex);
-		}
-
+		Optional<User> user = repository.selectById(id);
 		// 削除したユーザーの情報を返す
-		return new UserResponse(user.getId(), user.getName(), user.getAge(), user.getAddress());
+		return new UserDTO(user.get().getId(), user.get().getName(), user.get().getAge(), user.get().getAddress());
 	}
 
 }
