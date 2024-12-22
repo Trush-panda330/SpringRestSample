@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api") // ベースパス
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -36,7 +36,7 @@ public class UserController {
 	 * 
 	 * @return 全てのユーザー情報を含むResponseEntity<List<User>>
 	 */
-	@GetMapping("/user")
+	@GetMapping
 	public ResponseEntity<List<UserResponse>> getUsers() {
 		//		List<UserResponse> users = userService.getAllUser();
 		return ResponseEntity.ok(userService.getAllUser());
@@ -49,7 +49,7 @@ public class UserController {
 	 * @return 指定されたIDのユーザー情報を含むResponseEntity<User>
 	 * @throws UserNotFoundException 指定されたIDのユーザーが存在しない場合にスローされる
 	 */
-	@GetMapping("/user/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
@@ -62,7 +62,7 @@ public class UserController {
 	 * @param user 新規登録するUser情報
 	 * @return 新規登録が成功した場合の201のCreated ステータス
 	 */
-	@PostMapping("/user")
+	@PostMapping
 	public ResponseEntity<UserResponse> createUser(@Valid @RequestBody User user) {
 		UserResponse createUser= userService.createUser(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createUser);
@@ -90,7 +90,7 @@ public class UserController {
 	 * @param user 更新内容を含むユーザー情報
 	 * @return 更新されたユーザー情報を含むResponseEntity、またはエラーメッセージ
 	 */
-	@PutMapping("/user/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
 		try {
 			UserResponse updateUser = userService.updateUser(id, user);
@@ -110,7 +110,7 @@ public class UserController {
 	* @param id 削除するユーザーのID
 	* @return 削除されたユーザー情報を含むレスポンス。
 	*/
-	@DeleteMapping("/user/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id) {
 		try {
 			UserResponse deleteUser = userService.deleteUser(id);
