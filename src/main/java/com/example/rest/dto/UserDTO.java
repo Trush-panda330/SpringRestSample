@@ -1,4 +1,4 @@
-package com.example.rest.response;
+package com.example.rest.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+public class UserDTO {
 	
 	private Long id;
 	
