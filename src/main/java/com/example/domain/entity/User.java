@@ -1,9 +1,5 @@
 package com.example.domain.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,14 +10,12 @@ import lombok.NoArgsConstructor;
  * ユーザーエンティティを表すクラスです。
  * このクラスはデータベースに格納されるユーザー情報を管理します。
  */
-@Table(name="user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
 	/** ユーザーID*/
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	/** ユーザー名*/
