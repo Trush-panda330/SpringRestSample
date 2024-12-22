@@ -10,8 +10,12 @@ public class UserNotFoundException extends RuntimeException {
 	 * ユーザーが見つからなかった時にエラーメッセージを指定するコンストラクタです。
 	 * @param message エラーメッセージ
 	 */
-	public UserNotFoundException(String message) {
-		super(message);
+
+	private Long userId;
+
+	public UserNotFoundException(Long userId) {
+		super("指定されたID：" + userId + "のUser情報は見つかりません。");
+		this.userId = userId;
 	}
 
 }
