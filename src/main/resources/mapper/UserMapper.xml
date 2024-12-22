@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.domain.mapper.UserMapper">
+
+	<!-- 全ユーザーを取得するクエリ -->
+	<select id="selectAll">
+		resultType="com.example.domain.entity.User">
+		SELECT id, name, age, address FROM user
+	</select>
+
+	<!-- IDでユーザーを取得するクエリ -->
+	<select id="findById" parameterType="java.lang.Long"
+		resultType="com.example.domain.entity.User">
+		SELECT id, name, age, address FROM user WHERE id = #{id}
+	</select>
+
+	<!-- ユーザーを作成するクエリ -->
+	<insert id="createUser"
+		parameterType="com.example.domain.entity.User" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO user (name, age, address)
+		VALUES (#{name},
+		#{age},#{address})
+	</insert>
+
+	<!-- ユーザーを作成するクエリ -->
+	<update id="updateUser" parameterType="map">
+		UPDATE user
+		SET name =
+		#{user.name}, age = #{user.age}, address = #{user.address}
+		WHERE id =
+		#{id}
+	</update>
+
+	<!-- ユーザーを削除するクエリ -->
+	<delete id="deleteUser" parameterType="java.lang.Long">
+		DELETE FROM user WHERE id = #{id}
+	</delete>
+
+
+</mapper>
