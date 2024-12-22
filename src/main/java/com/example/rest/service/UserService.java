@@ -3,18 +3,12 @@ package com.example.rest.service;
 import com.example.domain.entity.User;
 import com.example.domain.mapper.UserRepository;
 import com.example.rest.dto.UserDTO;
-import com.example.rest.exception.UserCreationException;
-import com.example.rest.exception.UserDeletionException;
 import com.example.rest.exception.UserNotFoundException;
-import com.example.rest.exception.UserUpdateException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * ユーザーサービスの実装クラスです。ユーザー情報の取得、作成、更新、削除などの
@@ -54,6 +48,9 @@ public class UserService {
      * @throws UserNotFoundException 指定されたIDのユーザーが見つからない場合にスローされます。
      */
     public UserDTO getUserById(Long id) {
+        if(id == null || id <= 0) {
+            throw new IllegalArgumentException("IDは正の整数でなければいけません");
+        }
         return userRepository.selectById(id)
                 .map(user -> new UserDTO(
                         user.getId(),
@@ -81,7 +78,7 @@ public class UserService {
      *
      * @param id   更新するユーザーのID
      * @param userDTO UserDTO 更新するユーザー情報
-     * @throws UserUpdateException 指定されたIDのユーザーが見つからない場合にスローされます。
+     * @throws UserNotFoundException 指定されたIDのユーザーが見つからない場合にスローされます。
      */
     public void updateUser(Long id, UserDTO userDTO) {
         Optional<User> user = userRepository.selectById(id);
